@@ -13,8 +13,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.incomm.mahmad.weatherer.Model.CityWeather;
+
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by mahmad on 10/13/2017.
@@ -27,6 +32,8 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
     EditText editText;
     @BindView(R.id.get_weather_button)
     Button button;
+    @BindView(R.id.weather_data)
+    TextView weatherData;
 
     String location;
     private GetLocationPresenter presenter;
@@ -44,32 +51,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
         ButterKnife.bind(this, view);
         setupUi();
 
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                location = charSequence.toString();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), location, Toast.LENGTH_LONG).show();
-            }
-        });
-
         return view;
-
     }
 
     private void setupUi() {
@@ -79,5 +61,19 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
     @Override
     public void setLocationEditTextHint(String hint) {
         editText.setHint(hint);
+    }
+
+    @OnClick(R.id.get_weather_button)
+    public void clickWeatherButton() {
+        presenter.getWeather(editText.getText().toString());
+    }
+
+    public void displayError(String error) {
+        Toast.makeText(getActivity(), "null", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void displayWeather(List<CityWeather> resp) {
+        weatherData.setText(resp.toString());
     }
 }
