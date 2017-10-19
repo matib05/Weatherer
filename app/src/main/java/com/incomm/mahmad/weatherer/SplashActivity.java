@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
+import com.incomm.mahmad.weatherer.View.GetLocation.GetLocationActivity;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

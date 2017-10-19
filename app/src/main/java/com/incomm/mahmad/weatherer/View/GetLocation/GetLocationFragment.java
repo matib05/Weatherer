@@ -1,10 +1,9 @@
-package com.incomm.mahmad.weatherer;
+package com.incomm.mahmad.weatherer.View.GetLocation;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.incomm.mahmad.weatherer.Model.CityWeather;
+import com.incomm.mahmad.weatherer.GetLocationPresenter;
+import com.incomm.mahmad.weatherer.Model.CityResponse;
+import com.incomm.mahmad.weatherer.R;
+import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherFragment;
 
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,15 +66,29 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
 
     @OnClick(R.id.get_weather_button)
     public void clickWeatherButton() {
-        presenter.getWeather(editText.getText().toString());
+        location = editText.getText().toString();
+        presenter.getWeather(location);
     }
 
     public void displayError(String error) {
-        Toast.makeText(getActivity(), "null", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void displayWeather(List<CityWeather> resp) {
-        weatherData.setText(resp.toString());
+    public void displayWeather(String resp) {
+        weatherData.setText(resp);
+    }
+
+    @Override
+    public void startDisplayWeatherActivity(String[] responseData) {
+        Fragment fragment = new DisplayWeatherFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArray("weatherData", responseData);
+
+        fragment.setArguments(bundle);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
     }
 }

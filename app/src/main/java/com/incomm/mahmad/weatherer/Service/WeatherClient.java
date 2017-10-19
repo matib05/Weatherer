@@ -1,8 +1,6 @@
 package com.incomm.mahmad.weatherer.Service;
 
-import com.incomm.mahmad.weatherer.Model.CityWeather;
-
-import java.util.List;
+import com.incomm.mahmad.weatherer.Model.CityResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,7 +12,7 @@ import retrofit2.http.Query;
 
 public interface WeatherClient {
 
-    @GET
-    Call<List<CityWeather>> getWeatherForCity(@Query("q") String cityName);
+    @GET("weather")
+    Call<CityResponse> getWeatherForCity(@Query("q") String cityName, @Query("APPID") String APIKEY);
 
 }

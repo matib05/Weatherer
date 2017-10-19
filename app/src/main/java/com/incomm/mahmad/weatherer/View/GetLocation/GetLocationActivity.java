@@ -1,9 +1,11 @@
-package com.incomm.mahmad.weatherer;
+package com.incomm.mahmad.weatherer.View.GetLocation;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.incomm.mahmad.weatherer.R;
 
 public class GetLocationActivity extends AppCompatActivity {
 
