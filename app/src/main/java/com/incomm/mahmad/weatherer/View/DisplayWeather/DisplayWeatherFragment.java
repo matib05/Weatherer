@@ -11,12 +11,14 @@ import android.widget.TextView;
 import com.incomm.mahmad.weatherer.R;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by mahmad on 10/19/2017.
  */
 
 public class DisplayWeatherFragment extends Fragment {
+    private static final String ARG_RESPONSE_DATA = "responseData";
     @BindView(R.id.city)
     TextView cityName;
     @BindView(R.id.weather_main)
@@ -34,19 +36,23 @@ public class DisplayWeatherFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_weather, container, false);
-        if (savedInstanceState != null) {
-            String[] response  = savedInstanceState.getStringArray("weatherData");
-            cityName.setText(response[0]);
-            temperature.setText(response[1]);
-            weatherDescription.setText(response[2]);
-        }
-        else {
-            String data = "no data";
-            cityName.setText(data);
-            temperature.setText(data);
-            weatherDescription.setText(data);
-        }
+        ButterKnife.bind(this, view);
+        String[] response = (String[]) getArguments().getSerializable(ARG_RESPONSE_DATA);
+        String cityText  = "The name of the city is " + response[0];
+        String temperatureText = "Temperature (F): " + (1.8 *(Double.parseDouble(response[1]) -273) +32);
+        String weatherDescriptionText = "It is will be " + response[2] + "y today";
+        cityName.setText(cityText);
+        temperature.setText(temperatureText);
+        weatherDescription.setText(weatherDescriptionText);
 
         return view;
+    }
+
+    public static DisplayWeatherFragment newInstance(String[] responseData) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_RESPONSE_DATA, responseData);
+        DisplayWeatherFragment fragment = new DisplayWeatherFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 }

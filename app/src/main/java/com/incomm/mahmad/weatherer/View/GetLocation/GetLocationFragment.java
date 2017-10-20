@@ -1,9 +1,9 @@
 package com.incomm.mahmad.weatherer.View.GetLocation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.incomm.mahmad.weatherer.GetLocationPresenter;
-import com.incomm.mahmad.weatherer.Model.CityResponse;
 import com.incomm.mahmad.weatherer.R;
-import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherFragment;
+import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherActivity;
 
 
 import butterknife.BindView;
@@ -81,14 +80,8 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
 
     @Override
     public void startDisplayWeatherActivity(String[] responseData) {
-        Fragment fragment = new DisplayWeatherFragment();
-
-        Bundle bundle = new Bundle();
-        bundle.putStringArray("weatherData", responseData);
-
-        fragment.setArguments(bundle);
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment);
-        transaction.commit();
+        Intent intent = DisplayWeatherActivity.newIntent(getActivity(), responseData);
+        startActivity(intent);
+        getActivity().finish();
     }
 }

@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".View.GetLocation.GetLocationActivity" >
         </activity>
+        <activity android:name=".View.DisplayWeather.DisplayWeatherActivity" >
+        </activity>
     </application>
 
 </manifest>

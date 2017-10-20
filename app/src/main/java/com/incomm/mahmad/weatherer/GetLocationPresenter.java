@@ -32,9 +32,11 @@ public class GetLocationPresenter {
 
     public void getWeatherForCityCallBack(boolean isSuccess, CityResponse response) {
         if (isSuccess) {
-            String[] responseData = {response.getName(),
-                                        response.getMain().getTemp().toString(),
-                                        response.getWeather().get(0).getDescription()};
+            String[] responseData = {
+                    response.getName(),
+                    response.getMain().getTemp().toString(),
+                    response.getWeather().get(0).getDescription()
+            };
 
             locationView.startDisplayWeatherActivity(responseData);
         }

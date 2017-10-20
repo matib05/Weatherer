@@ -21,7 +21,8 @@ public class RetrofitManager {
 
     private GetLocationPresenter presenter;
     private String url = "http://api.openweathermap.org/data/2.5/";
-    private String apiKey = "85";
+    private String apiKey = "49f151dd5d4461bcf4246b385b0cc075";
+            //"31576d96eb3acb7333670187bc45f085";
 
     public RetrofitManager(GetLocationPresenter presenter) {
         this.presenter = presenter;
@@ -49,6 +50,7 @@ public class RetrofitManager {
             @Override
             public void onFailure(Call<CityResponse> call, Throwable t) {
                 Log.d(TAG, "onFailure:" +  t.getStackTrace());
+                t.printStackTrace();
             }
         });
     }
