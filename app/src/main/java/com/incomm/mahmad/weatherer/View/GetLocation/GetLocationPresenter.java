@@ -1,8 +1,7 @@
-package com.incomm.mahmad.weatherer;
+package com.incomm.mahmad.weatherer.View.GetLocation;
 
 import com.incomm.mahmad.weatherer.Model.CityResponse;
 import com.incomm.mahmad.weatherer.Service.RetrofitManager;
-import com.incomm.mahmad.weatherer.View.GetLocation.GetLocationView;
 
 /**
  * Created by mahmad on 10/13/2017.
@@ -11,6 +10,7 @@ import com.incomm.mahmad.weatherer.View.GetLocation.GetLocationView;
 public class GetLocationPresenter {
     private GetLocationView locationView;
     private RetrofitManager manager;
+    //private GoogleApiClient.Builder mGoogleApiClient;
 
     public GetLocationPresenter(GetLocationView view) {
         this.locationView = view;
@@ -21,12 +21,12 @@ public class GetLocationPresenter {
         locationView.setLocationEditTextHint("Enter City");
     }
 
-    public void getWeather(String city) {
-        if (city.isEmpty() || city == null) {
+    public void getWeather(String location) {
+        if (location.isEmpty()) {
             locationView.displayError("CITY IS NULL");
             return;
         }
-        manager.getWeather(city.trim());
+        manager.getWeather(location);
 
     }
 
@@ -43,5 +43,9 @@ public class GetLocationPresenter {
         else {
             locationView.displayError("Error, Cannot process request");
         }
+    }
+
+    public Object getLocationFromGPS() {
+        return null;
     }
 }

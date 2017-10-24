@@ -8,9 +8,8 @@ import com.incomm.mahmad.weatherer.Model.CityResponse;
 
 public interface GetLocationView {
     void setLocationEditTextHint(String hint);
-    void displayError(String errorMsg);
 
-    void displayWeather(String resp);
+    void displayError(String errorMsg);
 
     void startDisplayWeatherActivity(String[] responseData);
 }

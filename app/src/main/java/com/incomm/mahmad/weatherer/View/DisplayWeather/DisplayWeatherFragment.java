@@ -25,11 +25,20 @@ public class DisplayWeatherFragment extends Fragment {
     TextView weatherDescription;
     @BindView(R.id.main_temp)
     TextView temperature;
+    String weatherDescriptionText;
+    String temperatureText;
+    String cityText;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() !=  null) {
+            String[] response = (String[]) getArguments().getSerializable(ARG_RESPONSE_DATA);
+            cityText  = "The name of the city is " + response[0];
+            temperatureText = "Temperature (F): " + ((int) (1.8 *(Integer.parseInt(response[1]) -273) +32));
+            weatherDescriptionText = "We will have" + response[2] + " today";
+        }
     }
 
     @Nullable
@@ -37,21 +46,17 @@ public class DisplayWeatherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_weather, container, false);
         ButterKnife.bind(this, view);
-        String[] response = (String[]) getArguments().getSerializable(ARG_RESPONSE_DATA);
-        String cityText  = "The name of the city is " + response[0];
-        String temperatureText = "Temperature (F): " + (1.8 *(Double.parseDouble(response[1]) -273) +32);
-        String weatherDescriptionText = "It is will be " + response[2] + "y today";
-        cityName.setText(cityText);
-        temperature.setText(temperatureText);
-        weatherDescription.setText(weatherDescriptionText);
+        cityName.setText((cityText.isEmpty()) ? "City null" : cityText);
+        temperature.setText((cityText.isEmpty()) ? "temperature null" : temperatureText);
+        weatherDescription.setText((cityText.isEmpty()) ? "weather null" : weatherDescriptionText);
 
         return view;
     }
 
     public static DisplayWeatherFragment newInstance(String[] responseData) {
+        DisplayWeatherFragment fragment = new DisplayWeatherFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_RESPONSE_DATA, responseData);
-        DisplayWeatherFragment fragment = new DisplayWeatherFragment();
         fragment.setArguments(args);
         return fragment;
     }

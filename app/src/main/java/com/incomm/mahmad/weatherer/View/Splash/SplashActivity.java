@@ -1,4 +1,4 @@
-package com.incomm.mahmad.weatherer;
+package com.incomm.mahmad.weatherer.View.Splash;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
+import com.incomm.mahmad.weatherer.R;
 import com.incomm.mahmad.weatherer.View.GetLocation.GetLocationActivity;
 
 import butterknife.BindView;

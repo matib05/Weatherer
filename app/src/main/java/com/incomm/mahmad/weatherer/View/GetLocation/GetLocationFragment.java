@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.incomm.mahmad.weatherer.GetLocationPresenter;
 import com.incomm.mahmad.weatherer.R;
 import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherActivity;
 
@@ -32,10 +31,9 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
     EditText editText;
     @BindView(R.id.get_weather_button)
     Button button;
-    @BindView(R.id.weather_data)
-    TextView weatherData;
+    @BindView(R.id.get_location)
+    Button getLocationButton;
 
-    String location;
     private GetLocationPresenter presenter;
 
     @Override
@@ -56,6 +54,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
 
     private void setupUi() {
         presenter.getLocationEditTextHint();
+        presenter.getLocationFromGPS();
     }
 
     @Override
@@ -64,18 +63,17 @@ public class GetLocationFragment extends Fragment implements GetLocationView {
     }
 
     @OnClick(R.id.get_weather_button)
-    public void clickWeatherButton() {
-        location = editText.getText().toString();
-        presenter.getWeather(location);
+    public void onClickWeather() {
+        presenter.getWeather(editText.getText().toString().trim());
+    }
+
+    @OnClick(R.id.get_location)
+    public void onClickLocation() {
+
     }
 
     public void displayError(String error) {
         Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void displayWeather(String resp) {
-        weatherData.setText(resp);
     }
 
     @Override

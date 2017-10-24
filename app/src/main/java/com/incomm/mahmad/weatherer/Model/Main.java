@@ -22,8 +22,8 @@ public class Main {
     @Expose
     private Double tempMax;
 
-    public Double getTemp() {
-        return temp;
+    public Integer getTemp() {
+        return temp.intValue();
     }
 
     public void setTemp(Double temp) {

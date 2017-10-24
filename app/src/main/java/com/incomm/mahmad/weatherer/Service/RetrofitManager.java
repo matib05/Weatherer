@@ -2,7 +2,7 @@ package com.incomm.mahmad.weatherer.Service;
 
 import android.util.Log;
 
-import com.incomm.mahmad.weatherer.GetLocationPresenter;
+import com.incomm.mahmad.weatherer.View.GetLocation.GetLocationPresenter;
 import com.incomm.mahmad.weatherer.Model.CityResponse;
 
 import retrofit2.Call;
