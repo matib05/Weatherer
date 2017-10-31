@@ -10,7 +10,6 @@ import com.incomm.mahmad.weatherer.Service.RetrofitManager;
 public class GetLocationPresenter {
     private GetLocationView locationView;
     private RetrofitManager manager;
-    //private GoogleApiClient.Builder mGoogleApiClient;
 
     public GetLocationPresenter(GetLocationView view) {
         this.locationView = view;
@@ -45,7 +44,4 @@ public class GetLocationPresenter {
         }
     }
 
-    public Object getLocationFromGPS() {
-        return null;
-    }
 }
