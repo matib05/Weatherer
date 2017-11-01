@@ -52,7 +52,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     TextView longitude;
 
     private static final String TAG = GetLocationFragment.class.getSimpleName();
-
+    private static final int PERMISSIONS_CODE = 123;
 
     private GetLocationPresenter presenter;
     private GoogleApiClient mGoogleApiClient;
@@ -91,7 +91,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
 
     @OnClick(R.id.get_weather_button)
     public void onClickWeather() {
-        presenter.getWeather(editText.getText().toString().trim());
+        presenter.getWeatherForCity(editText.getText().toString().trim());
     }
 
     @SuppressLint("MissingPermission")
@@ -99,15 +99,20 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     public void onClickLocation() {
         if (mLastLocation == null) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        GetLocationActivity.PERMISSIONS_CODE
+                        PERMISSIONS_CODE
             );
             Log.d(TAG, "onClickLocation: CREATED PERMISSIONS");
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             latitude.setText(R.string.null_text);
             longitude.setText(R.string.null_text);
         } else {
             latitude.setText(String.valueOf(mLastLocation.getLatitude()));
             longitude.setText(String.valueOf(mLastLocation.getLongitude()));
+            double[] coordinates = new double[]{
+                mLastLocation.getLatitude(),
+                mLastLocation.getLongitude()
+            };
+            presenter.getWeatherForCoordinates(coordinates);
         }
     }
 
@@ -158,8 +163,9 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
 
             Log.d(TAG, "onConnected: YOU DON'T HAVE PERMISSIONS, CREATING PERMISSIONS");
             ActivityCompat.requestPermissions(getActivity(), new String[]{ Manifest.permission.ACCESS_FINE_LOCATION },
-                    GetLocationActivity.PERMISSIONS_CODE);
+                    PERMISSIONS_CODE);
         }
+        //call requestLocation here
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         handleNewLocation();
 

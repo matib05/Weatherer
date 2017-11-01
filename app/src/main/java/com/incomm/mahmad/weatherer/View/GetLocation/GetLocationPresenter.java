@@ -20,13 +20,21 @@ public class GetLocationPresenter {
         locationView.setLocationEditTextHint("Enter City");
     }
 
-    public void getWeather(String location) {
+    public void getWeatherForCity(String location) {
         if (location.isEmpty()) {
             locationView.displayError("CITY IS NULL");
             return;
         }
-        manager.getWeather(location);
+        manager.getWeatherForCity(location);
 
+    }
+
+    public void getWeatherForCoordinates(double[] coordinates) {
+        if (coordinates.length == 0) {
+            locationView.displayError("COORDINATES ARE EMPTY");
+            return;
+        }
+        manager.getWeatherForCoordinates(coordinates);
     }
 
     public void getWeatherForCityCallBack(boolean isSuccess, CityResponse response) {

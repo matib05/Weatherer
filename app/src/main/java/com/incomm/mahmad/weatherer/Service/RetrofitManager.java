@@ -28,7 +28,7 @@ public class RetrofitManager {
         this.presenter = presenter;
     }
 
-    public void getWeather(String city) {
+    public void getWeatherForCity(String city) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -36,7 +36,7 @@ public class RetrofitManager {
         WeatherClient client = retrofit.create(WeatherClient.class);
 
         Call<CityResponse> call = client.getWeatherForCity(city,apiKey);
-        Log.d(TAG, "getWeather: " + call.toString());
+        Log.d(TAG, "getWeatherForCity: " + call.toString());
         call.enqueue(new Callback<CityResponse>() {
             @Override
             public void onResponse(Call<CityResponse> call, Response<CityResponse> response) {
@@ -55,6 +55,33 @@ public class RetrofitManager {
         });
     }
 
+    public void getWeatherForCoordinates(double[] coordinates) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        WeatherClient client = retrofit.create(WeatherClient.class);
+
+        Call<CityResponse> call = client.getWeatherForCoordinates(coordinates[0], coordinates[1], apiKey);
+            Log.d(TAG, "getWeatherForCity: " + call.toString());
+            call.enqueue(new Callback<CityResponse>() {
+            @Override
+            public void onResponse(Call<CityResponse> call, Response<CityResponse> response) {
+                Log.i("GetWeather", "Response Code: " + response.code() + "\n" + "Response: " + response.raw());
+                if (response.isSuccessful() && response.code() == 200) {
+                    CityResponse resp = response.body();
+                    presenter.getWeatherForCityCallBack(true, resp);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CityResponse> call, Throwable t) {
+                Log.d(TAG, "onFailure:" +  t.getStackTrace());
+                t.printStackTrace();
+            }
+        });
+    }
 
 
 
