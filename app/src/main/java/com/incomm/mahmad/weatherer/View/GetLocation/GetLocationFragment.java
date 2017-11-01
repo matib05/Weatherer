@@ -19,18 +19,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.incomm.mahmad.weatherer.R;
 import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherActivity;
 
@@ -38,14 +31,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by mahmad on 10/13/2017.
  */
 
 public class GetLocationFragment extends Fragment implements GetLocationView,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
     @BindView(R.id.search_location)
     TextView textView;
     @BindView(R.id.search_box)
@@ -59,11 +51,13 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     @BindView(R.id.longitude)
     TextView longitude;
 
+    private static final String TAG = GetLocationFragment.class.getSimpleName();
+
+
     private GetLocationPresenter presenter;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
-    private LocationListener mLocationListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,35 +70,12 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_get_location, container, false);
         ButterKnife.bind(this, view);
-
         createGoogleApiClient();
-
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_LOW_POWER)
+                .setInterval(10000)
+                .setFastestInterval(5000);
         setupUi();
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(createLocationRequest());
-        final PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi
-                        .checkLocationSettings(mGoogleApiClient, builder.build());
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
-                Status status = locationSettingsResult.getStatus();
-                final LocationSettingsStates states = locationSettingsResult.getLocationSettingsStates();
-                switch (status.getStatusCode()) {
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        Log.d(TAG, "onResult: success");
-                        break;
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Log.d(TAG, "onResult: resolution required");
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        Log.d(TAG, "onResult: settings change unavailable");
-                        break;
-                }
-            }
-        });
-
 
         return view;
     }
@@ -123,8 +94,21 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         presenter.getWeather(editText.getText().toString().trim());
     }
 
+    @SuppressLint("MissingPermission")
     @OnClick(R.id.get_location)
     public void onClickLocation() {
+        if (mLastLocation == null) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        GetLocationActivity.PERMISSIONS_CODE
+            );
+            Log.d(TAG, "onClickLocation: CREATED PERMISSIONS");
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            latitude.setText(R.string.null_text);
+            longitude.setText(R.string.null_text);
+        } else {
+            latitude.setText(String.valueOf(mLastLocation.getLatitude()));
+            longitude.setText(String.valueOf(mLastLocation.getLongitude()));
+        }
     }
 
     public void displayError(String error) {
@@ -150,68 +134,62 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     }
 
     @Override
-    public void onStart() {
+    public void onResume() {
+        super.onResume();
         mGoogleApiClient.connect();
-        super.onStart();
     }
 
     @Override
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
+    public void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected: Connected");
-        if (checkPermissions()) {
-            Log.d(TAG, "onConnected: NO PERMISSION");
-            return;
+        Log.d(TAG, "onConnected!");
+        if (ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            Log.d(TAG, "onConnected: YOU DON'T HAVE PERMISSIONS, CREATING PERMISSIONS");
+            ActivityCompat.requestPermissions(getActivity(), new String[]{ Manifest.permission.ACCESS_FINE_LOCATION },
+                    GetLocationActivity.PERMISSIONS_CODE);
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        handleNewLocation();
+
+    }
+
+    private void handleNewLocation() {
         if (mLastLocation != null) {
-            String latitude = String.valueOf(mLastLocation.getLatitude());
-            String longitude = String.valueOf(mLastLocation.getLongitude());
-            Log.d(TAG, "onConnected: COORDINATES" + latitude + ", " + longitude);
+            Log.d(TAG, "handleNewLocation: " + mLastLocation.toString().toUpperCase());
         }
-        startLocationUpdates();
-    }
-
-    @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
-        if (checkPermissions()) {
-            return;
+        else {
+            Log.d(TAG, "handleNewLocation: mLastLocation is null");
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
-    }
 
-    private LocationRequest createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        return mLocationRequest;
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended: Suspended");
+        Log.d(TAG, "onConnectionSuspended: Suspended, calling connect...");
+        mGoogleApiClient.connect();
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed: Failed");
-    }
-
-    public boolean checkPermissions() {
-        return (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
+        Log.d(TAG, "onConnectionFailed: Failed with code: " + connectionResult.getErrorCode()
+                +  "and message: " + connectionResult.getErrorMessage());
     }
 
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        this.latitude.setText(String.valueOf(mLastLocation.getLatitude()));
-        this.longitude.setText(String.valueOf(mLastLocation.getLongitude()));
+        handleNewLocation();
     }
 }
