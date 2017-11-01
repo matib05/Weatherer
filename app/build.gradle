@@ -2,7 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+<<<<<<< HEAD
     buildToolsVersion '26.0.2'
+=======
+    buildToolsVersion "26.0.2"
+>>>>>>> 89d5e7046eb958b70655a3424cf6b4ab5e57086b
     defaultConfig {
         applicationId "com.incomm.mahmad.weatherer"
         minSdkVersion 15
@@ -30,6 +34,8 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.android.support:support-v4:26.+'
+    compile 'com.google.android.gms:play-services-maps:11.0.4'
+    compile 'com.google.android.gms:play-services-location:11.0.4'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

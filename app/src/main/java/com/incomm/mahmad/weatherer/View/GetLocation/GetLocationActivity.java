@@ -7,8 +7,7 @@ import android.os.Bundle;
 
 import com.incomm.mahmad.weatherer.R;
 
-public class GetLocationActivity extends AppCompatActivity {
-
+public class GetLocationActivity extends AppCompatActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +23,5 @@ public class GetLocationActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-
     }
 }
