@@ -2,11 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-<<<<<<< HEAD
     buildToolsVersion '26.0.2'
-=======
-    buildToolsVersion "26.0.2"
->>>>>>> 89d5e7046eb958b70655a3424cf6b4ab5e57086b
     defaultConfig {
         applicationId "com.incomm.mahmad.weatherer"
         minSdkVersion 15

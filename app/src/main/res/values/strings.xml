@@ -9,4 +9,7 @@
     <string name="null_text">null</string>
     <string name="long_text">Longitude: </string>
     <string name="lat_text">Latitude: </string>
+    <string name="gps_network_not_enabled_message">GPS network not enabled. Open location settions to enable it</string>
+    <string name="open_location_settings">Open Location Settings</string>
+    <string name="Cancel">Cancel</string>
 </resources>

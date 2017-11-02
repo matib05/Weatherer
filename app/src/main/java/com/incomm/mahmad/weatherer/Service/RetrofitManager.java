@@ -71,7 +71,7 @@ public class RetrofitManager {
                 Log.i("GetWeather", "Response Code: " + response.code() + "\n" + "Response: " + response.raw());
                 if (response.isSuccessful() && response.code() == 200) {
                     CityResponse resp = response.body();
-                    presenter.getWeatherForCityCallBack(true, resp);
+                    presenter.getWeatherForCoordinatesCallBack(true, resp);
                 }
             }
 
@@ -82,7 +82,4 @@ public class RetrofitManager {
             }
         });
     }
-
-
-
 }
