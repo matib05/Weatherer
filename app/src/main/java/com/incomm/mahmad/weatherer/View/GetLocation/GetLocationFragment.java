@@ -32,6 +32,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.incomm.mahmad.weatherer.R;
 import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -95,27 +98,27 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
 
     private void setupUi() {
         presenter.getLocationEditTextHint();
-        /*setDegrees();
+        setDegrees();
         setCity();
         setWeatherDescription();
-        setLastUpdated();*/
+        setLastUpdated();
     }
 
     private void setDegrees() {
-        String degreeInFahrenheit = String.valueOf((int) (1.8 *(Integer.parseInt(settings.getString("temperature", null)) -273) +32));
-        this.degrees.setText(degreeInFahrenheit + "°F", null);
+        String degreeInFahrenheit = String.valueOf((int) (1.8 *(Integer.parseInt(settings.getString("temperature", "0")) -273) +32)) + "°F";
+        this.degrees.setText(degreeInFahrenheit);
     }
 
     private void setCity() {
-        this.cityText.setText(settings.getString("city", null));
+        this.cityText.setText(settings.getString("city", "city"));
     }
 
     private void setWeatherDescription() {
-        weatherDescription.setText(settings.getString("description", null));
+        weatherDescription.setText(settings.getString("description", "description"));
     }
 
     private void setLastUpdated() {
-        this.lastUpdated.setText(settings.getString("lastUpdated", null));
+        this.lastUpdated.setText(settings.getString("lastUpdated", "Last Updated"));
     }
 
     @Override
@@ -225,13 +228,16 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     @Override
     public void saveDataToSharedPreferences(String[] responseData) {
 
-        Date lastUpdated = new Date();
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd hh:mm");
+        String lastUpdated = formatter.format(date);
+        Log.d(TAG, "saveDataToSharedPreferences: " + lastUpdated);
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("city", responseData[0]);
         editor.putString("temperature", responseData[1]);
         editor.putString("description", responseData[2]);
-        editor.putString("lastUpdated", lastUpdated.toString());
+        editor.putString("lastUpdated", lastUpdated);
         editor.apply();
     }
 

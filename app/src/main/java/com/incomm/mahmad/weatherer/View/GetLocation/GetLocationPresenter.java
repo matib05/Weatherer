@@ -62,7 +62,8 @@ public class GetLocationPresenter {
                     response.getMain().getTemp().toString(),
                     response.getWeather().get(0).getDescription()
             };
-            /*locationView.saveDataToSharedPreferences(responseData);
+            locationView.saveDataToSharedPreferences(responseData);
+            /*
             locationView.setDegrees(responseData);
             locationView.setCity(responseData[0]);
             locationView.setWeatherDescription(responseData[2]);
