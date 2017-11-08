@@ -177,8 +177,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     private void handleNewLocation() {
         if (mLastLocation != null) {
             Log.d(TAG, "handleNewLocation: " + mLastLocation.toString().toUpperCase());
-        }
-        else {
+        } else {
             Log.d(TAG, "handleNewLocation: mLastLocation is null");
         }
 
