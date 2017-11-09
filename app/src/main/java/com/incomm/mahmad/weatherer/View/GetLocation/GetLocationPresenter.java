@@ -48,7 +48,7 @@ public class GetLocationPresenter {
                     response.getWeather().get(0).getDescription()
             };
 
-            locationView.startDisplayWeatherActivity(responseData);
+            locationView.saveDataToSharedPreferences(responseData);
         }
         else {
             locationView.displayError("Error, Cannot process request");
@@ -60,7 +60,7 @@ public class GetLocationPresenter {
             String[] responseData = {
                     response.getName(),
                     response.getMain().getTemp().toString(),
-                    response.getWeather().get(0).getDescription()
+                    response.getWeather().get(0).getMain()
             };
             locationView.saveDataToSharedPreferences(responseData);
         } else {

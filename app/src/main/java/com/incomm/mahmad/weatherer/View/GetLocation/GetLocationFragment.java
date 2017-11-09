@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +49,8 @@ import butterknife.OnClick;
 public class GetLocationFragment extends Fragment implements GetLocationView,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+    @BindView(R.id.get_location_fragment)
+    LinearLayout layout;
     @BindView(R.id.search_location)
     TextView degrees;
     @BindView(R.id.search_box)
@@ -100,21 +103,37 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         presenter.getLocationEditTextHint();
         setDegrees();
         setCity();
-        setWeatherDescription();
+        setWeatherDescriptionAndBackground();
         setLastUpdated();
     }
 
     private void setDegrees() {
-        String degreeInFahrenheit = String.valueOf((int) (1.8 *(Integer.parseInt(settings.getString("temperature", "0")) -273) +32)) + "°F";
+        String degreeInFahrenheit = String.valueOf((int) (1.8 *(Integer.parseInt(settings.getString("temperature", "255")) -273) +32)) + "°F";
         this.degrees.setText(degreeInFahrenheit);
     }
 
     private void setCity() {
-        this.cityText.setText(settings.getString("city", "city"));
+        String cityText = settings.getString("city", "city") + " |";
+        this.cityText.setText(cityText.toUpperCase());
     }
 
-    private void setWeatherDescription() {
-        weatherDescription.setText(settings.getString("description", "description"));
+    @SuppressLint("NewApi")
+    private void setWeatherDescriptionAndBackground() {
+        String description = settings.getString("description", "normal").toLowerCase();
+
+        if (description.contains("mist")) {
+            layout.setBackground(getResources().getDrawable(R.drawable.misty_skies));
+        } else if (description.contains("rain") || description.contains("drizzle")) {
+            layout.setBackground(getResources().getDrawable(R.drawable.rainy_skies));
+        } else if (description.contains("cloud") || description.contains("overcast")) {
+            layout.setBackground(getResources().getDrawable(R.drawable.cloud_skies));
+        } else if (description.contains("haze")) {
+            layout.setBackground(getResources().getDrawable(R.drawable.haze_skies));
+        } else {
+            layout.setBackground(getResources().getDrawable(R.drawable.clear_skies));
+        }
+
+        weatherDescription.setText(settings.getString("description", "description").toUpperCase());
     }
 
     private void setLastUpdated() {
@@ -146,7 +165,8 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
             });
             if (mLastLocation == null) {
                 Log.d(TAG, "onClickLocation: STILL NULLLLLLLLLLLLLLLLLLLLLLLLLL");
-                Toast.makeText(getContext(), "Location is Null", Toast.LENGTH_LONG).show();
+                String toastMessage = "\"Location is not set.\\nPlease turn on Location and click \\\"Get Location\\\"\"";
+                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();
             }
             return;
         }
@@ -230,7 +250,6 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd hh:mm");
         String lastUpdated = formatter.format(date);
-        Log.d(TAG, "saveDataToSharedPreferences: " + lastUpdated);
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("city", responseData[0]);
@@ -238,7 +257,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         editor.putString("temperature", responseData[1]);
         setDegrees();
         editor.putString("description", responseData[2]);
-        setWeatherDescription();
+        setWeatherDescriptionAndBackground();
         editor.putString("lastUpdated", lastUpdated);
         setLastUpdated();
         editor.apply();
