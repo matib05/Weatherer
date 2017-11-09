@@ -3,6 +3,9 @@ package com.incomm.mahmad.weatherer.View.GetLocation;
 import com.incomm.mahmad.weatherer.Model.CityResponse;
 import com.incomm.mahmad.weatherer.Service.RetrofitManager;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 /**
  * Created by mahmad on 10/13/2017.
  */
@@ -59,8 +62,9 @@ public class GetLocationPresenter {
                     response.getMain().getTemp().toString(),
                     response.getWeather().get(0).getDescription()
             };
-
-            locationView.startDisplayWeatherActivity(responseData);
+            locationView.saveDataToSharedPreferences(responseData);
+        } else {
+            locationView.displayError("Error, Cannot process request");
         }
     }
 }

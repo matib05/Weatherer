@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,6 +33,10 @@ import com.google.android.gms.location.LocationServices;
 import com.incomm.mahmad.weatherer.R;
 import com.incomm.mahmad.weatherer.View.DisplayWeather.DisplayWeatherActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -44,30 +49,37 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     @BindView(R.id.search_location)
-    TextView textView;
+    TextView degrees;
     @BindView(R.id.search_box)
     EditText editText;
     @BindView(R.id.get_weather_button)
     Button button;
     @BindView(R.id.get_location)
     Button getLocationButton;
-    @BindView(R.id.latitude)
-    TextView latitude;
-    @BindView(R.id.longitude)
-    TextView longitude;
+    @BindView(R.id.city)
+    TextView cityText;
+    @BindView(R.id.weather_description)
+    TextView weatherDescription;
+    @BindView(R.id.last_updated)
+    TextView lastUpdated;
 
     private static final String TAG = GetLocationFragment.class.getSimpleName();
     private static final int PERMISSIONS_CODE = 123;
+    double[] coordinates;
 
     private GetLocationPresenter presenter;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
+    private String RESPONSE_DATA = "WeatherResponseDataFile";
+    private SharedPreferences settings;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new GetLocationPresenter(this);
+        settings = getActivity().getSharedPreferences(RESPONSE_DATA, Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -78,15 +90,35 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         createGoogleApiClient();
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_LOW_POWER)
-                .setInterval(10000)
-                .setFastestInterval(5000);
+                .setInterval(100000)
+                .setFastestInterval(10000);
         setupUi();
-
         return view;
     }
 
     private void setupUi() {
         presenter.getLocationEditTextHint();
+        setDegrees();
+        setCity();
+        setWeatherDescription();
+        setLastUpdated();
+    }
+
+    private void setDegrees() {
+        String degreeInFahrenheit = String.valueOf((int) (1.8 *(Integer.parseInt(settings.getString("temperature", "0")) -273) +32)) + "°F";
+        this.degrees.setText(degreeInFahrenheit);
+    }
+
+    private void setCity() {
+        this.cityText.setText(settings.getString("city", "city"));
+    }
+
+    private void setWeatherDescription() {
+        weatherDescription.setText(settings.getString("description", "description"));
+    }
+
+    private void setLastUpdated() {
+        this.lastUpdated.setText(settings.getString("lastUpdated", "Last Updated"));
     }
 
     @Override
@@ -114,15 +146,11 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
             });
             if (mLastLocation == null) {
                 Log.d(TAG, "onClickLocation: STILL NULLLLLLLLLLLLLLLLLLLLLLLLLL");
-                return;
+                Toast.makeText(getContext(), "Location is Null", Toast.LENGTH_LONG).show();
             }
-            latitude.setText(String.valueOf(mLastLocation.getLatitude()));
-            longitude.setText(String.valueOf(mLastLocation.getLongitude()));
             return;
         }
-        latitude.setText(String.valueOf(mLastLocation.getLatitude()));
-        longitude.setText(String.valueOf(mLastLocation.getLongitude()));
-        double[] coordinates = new double[] {
+        coordinates = new double[] {
                 mLastLocation.getLatitude(),
                 mLastLocation.getLongitude()
         };
@@ -138,6 +166,14 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         Intent intent = DisplayWeatherActivity.newIntent(getActivity(), responseData);
         startActivity(intent);
         getActivity().finish();
+    }
+
+    @Override
+    public void setDegrees(String[] responseData) {
+        if (responseData[1] != null) {
+            Integer degree = ((int) (1.8 *(Integer.parseInt(responseData[1]) -273) +32));
+            degrees.setText(degree + "°F");
+        }
     }
 
     private void createGoogleApiClient() {
@@ -176,11 +212,36 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
 
     private void handleNewLocation() {
         if (mLastLocation != null) {
-            Log.d(TAG, "handleNewLocation: " + mLastLocation.toString().toUpperCase());
+            Log.d(TAG, "handleNewLocation: " + mLastLocation.toString());
+            coordinates = new double[] {
+                    mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude()
+            };
+            presenter.getWeatherForCoordinates(coordinates);
         } else {
             Log.d(TAG, "handleNewLocation: mLastLocation is null");
         }
 
+    }
+
+    @Override
+    public void saveDataToSharedPreferences(String[] responseData) {
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd hh:mm");
+        String lastUpdated = formatter.format(date);
+        Log.d(TAG, "saveDataToSharedPreferences: " + lastUpdated);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("city", responseData[0]);
+        setCity();
+        editor.putString("temperature", responseData[1]);
+        setDegrees();
+        editor.putString("description", responseData[2]);
+        setWeatherDescription();
+        editor.putString("lastUpdated", lastUpdated);
+        setLastUpdated();
+        editor.apply();
     }
 
     @Override

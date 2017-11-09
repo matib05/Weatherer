@@ -1,11 +1,8 @@
 <resources>
     <string name="app_name">Weatherer</string>
-    <string name="search_location">Search Location:</string>
-    <string name="get_weather">Get Weather</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="get_location">Get Location</string>
+    <string name="degrees">°F</string>
+    <string name="get_weather">Get By City</string>
+    <string name="get_location">Get By Location</string>
     <string name="null_text">null</string>
     <string name="long_text">Longitude: </string>
     <string name="lat_text">Latitude: </string>
