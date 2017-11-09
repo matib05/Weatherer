@@ -153,9 +153,14 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     @SuppressLint("MissingPermission")
     @OnClick(R.id.get_location)
     public void onClickLocation() {
-        if (mLastLocation == null) {
-            requestPermissions();
-            Log.d(TAG, "onClickLocation: requestPermissions Called");
+        getLocation();
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLocation() {
+        requestPermissions();
+        while (mLastLocation == null) {
+            Log.d(TAG, "getLocation: requestPermissions Called");
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
@@ -163,12 +168,12 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
                     handleNewLocation();
                 }
             });
-            if (mLastLocation == null) {
-                Log.d(TAG, "onClickLocation: STILL NULLLLLLLLLLLLLLLLLLLLLLLLLL");
-                String toastMessage = "\"Location is not set.\\nPlease turn on Location and click \\\"Get Location\\\"\"";
-                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();
+            if (mLastLocation != null) {
+                Log.d(TAG, "getLocation: mLastLocation is NOT NULL");
+                break;
+                /*String toastMessage = "Location is not set.\nPlease turn on Location and click \"Get Location\"";
+                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();*/
             }
-            return;
         }
         coordinates = new double[] {
                 mLastLocation.getLatitude(),
