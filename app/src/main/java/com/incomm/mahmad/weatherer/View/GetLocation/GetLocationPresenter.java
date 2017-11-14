@@ -1,10 +1,11 @@
 package com.incomm.mahmad.weatherer.View.GetLocation;
 
+import android.util.Log;
+
 import com.incomm.mahmad.weatherer.Model.CityResponse;
 import com.incomm.mahmad.weatherer.Service.RetrofitManager;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by mahmad on 10/13/2017.
@@ -47,7 +48,7 @@ public class GetLocationPresenter {
                     response.getMain().getTemp().toString(),
                     response.getWeather().get(0).getDescription()
             };
-
+            Log.d(TAG, "getWeatherForCityCallBack: " + response.toString());
             locationView.saveDataToSharedPreferences(responseData);
         }
         else {

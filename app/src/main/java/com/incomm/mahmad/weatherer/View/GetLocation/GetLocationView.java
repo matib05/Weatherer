@@ -14,9 +14,5 @@ public interface GetLocationView {
 
     void displayError(String errorMsg);
 
-    void startDisplayWeatherActivity(String[] responseData);
-
-    void setDegrees(String[] responseData);
-
     void saveDataToSharedPreferences(String[] responseData);
 }

@@ -36,7 +36,6 @@ public class RetrofitManager {
         WeatherClient client = retrofit.create(WeatherClient.class);
 
         Call<CityResponse> call = client.getWeatherForCity(city,apiKey);
-        Log.d(TAG, "getWeatherForCity: " + call.toString());
         call.enqueue(new Callback<CityResponse>() {
             @Override
             public void onResponse(Call<CityResponse> call, Response<CityResponse> response) {

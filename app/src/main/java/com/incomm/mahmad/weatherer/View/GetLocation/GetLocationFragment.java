@@ -75,14 +75,14 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private String RESPONSE_DATA = "WeatherResponseDataFile";
-    private SharedPreferences settings;
+    SharedPreferences settings;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new GetLocationPresenter(this);
-        settings = getActivity().getSharedPreferences(RESPONSE_DATA, Context.MODE_PRIVATE);
+
     }
 
     @Nullable
@@ -100,6 +100,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     }
 
     private void setupUi() {
+        settings = getActivity().getSharedPreferences(RESPONSE_DATA, Context.MODE_WORLD_READABLE);
         presenter.getLocationEditTextHint();
         setDegrees();
         setCity();
@@ -159,7 +160,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
     @SuppressLint("MissingPermission")
     public void getLocation() {
         requestPermissions();
-        while (mLastLocation == null) {
+        if (mLastLocation == null) {
             Log.d(TAG, "getLocation: requestPermissions Called");
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, new LocationListener() {
                 @Override
@@ -169,36 +170,19 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
                 }
             });
             if (mLastLocation != null) {
-                Log.d(TAG, "getLocation: mLastLocation is NOT NULL");
-                break;
-                /*String toastMessage = "Location is not set.\nPlease turn on Location and click \"Get Location\"";
-                Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();*/
+                Log.d(TAG, "getLocation: mLastLocation is " + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude());
+                coordinates = new double[]{
+                        mLastLocation.getLatitude(),
+                        mLastLocation.getLongitude()
+                };
+                return;
             }
         }
-        coordinates = new double[] {
-                mLastLocation.getLatitude(),
-                mLastLocation.getLongitude()
-        };
         presenter.getWeatherForCoordinates(coordinates);
     }
 
     public void displayError(String error) {
         Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void startDisplayWeatherActivity(String[] responseData) {
-        Intent intent = DisplayWeatherActivity.newIntent(getActivity(), responseData);
-        startActivity(intent);
-        getActivity().finish();
-    }
-
-    @Override
-    public void setDegrees(String[] responseData) {
-        if (responseData[1] != null) {
-            Integer degree = ((int) (1.8 *(Integer.parseInt(responseData[1]) -273) +32));
-            degrees.setText(degree + "°F");
-        }
     }
 
     private void createGoogleApiClient() {
@@ -251,12 +235,13 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
 
     @Override
     public void saveDataToSharedPreferences(String[] responseData) {
-
+        Log.d(TAG, "saveDataToSharedPreferences: " + responseData.toString());
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat formatter = new SimpleDateFormat("EEE MM/dd hh:mm");
         String lastUpdated = formatter.format(date);
-
-        SharedPreferences.Editor editor = settings.edit();
+        settings = getActivity().getSharedPreferences(RESPONSE_DATA, Context.MODE_WORLD_READABLE);
+        SharedPreferences.Editor editor;
+        editor = settings.edit();
         editor.putString("city", responseData[0]);
         setCity();
         editor.putString("temperature", responseData[1]);
@@ -266,6 +251,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
         editor.putString("lastUpdated", lastUpdated);
         setLastUpdated();
         editor.apply();
+        setupUi();
     }
 
     @Override
@@ -319,7 +305,7 @@ public class GetLocationFragment extends Fragment implements GetLocationView,
                 @Override
                 public void onClick(DialogInterface paramDialogInterface, int paramInt) {
                     Log.d(TAG, "onClick: setPositiveButton clicked");
-                    Intent ActionLocationSourceSettings = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    Intent ActionLocationSourceSettings = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     getContext().startActivity(ActionLocationSourceSettings);
                 }
             });
